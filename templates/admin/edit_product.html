@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Producto - Admin{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="admin-header">
+        <h1><i class="fas fa-edit"></i> Editar Producto</h1>
+        <a href="{{ url_for('admin_products') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    </div>
+    
+    <div class="form-container">
+        <form method="POST" class="product-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">
+                        <i class="fas fa-tag"></i> Nombre del Producto
+                    </label>
+                    <input type="text" id="name" name="name" value="{{ product.name }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="category">
+                        <i class="fas fa-folder"></i> Categoría
+                    </label>
+                    <select id="category" name="category">
+                        <option value="">Seleccionar categoría</option>
+                        <option value="Electrónicos" {% if product.category == 'Electrónicos' %}selected{% endif %}>Electrónicos</option>
+                        <option value="Ropa" {% if product.category == 'Ropa' %}selected{% endif %}>Ropa</option>
+                        <option value="Hogar" {% if product.category == 'Hogar' %}selected{% endif %}>Hogar</option>
+                        <option value="Deportes" {% if product.category == 'Deportes' %}selected{% endif %}>Deportes</option>
+                        <option value="Libros" {% if product.category == 'Libros' %}selected{% endif %}>Libros</option>
+                        <option value="Belleza" {% if product.category == 'Belleza' %}selected{% endif %}>Belleza</option>
+                        <option value="Juguetes" {% if product.category == 'Juguetes' %}selected{% endif %}>Juguetes</option>
+                        <option value="Otros" {% if product.category == 'Otros' %}selected{% endif %}>Otros</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">
+                    <i class="fas fa-align-left"></i> Descripción
+                </label>
+                <textarea id="description" name="description" rows="4" 
+                          placeholder="Describe tu producto...">{{ product.description or '' }}</textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="price">
+                        <i class="fas fa-dollar-sign"></i> Precio
+                    </label>
+                    <input type="number" id="price" name="price" step="0.01" min="0" 
+                           value="{{ product.price }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="stock">
+                        <i class="fas fa-boxes"></i> Stock
+                    </label>
+                    <input type="number" id="stock" name="stock" min="0" 
+                           value="{{ product.stock }}" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="image_url">
+                    <i class="fas fa-image"></i> URL de la Imagen
+                </label>
+                <input type="url" id="image_url" name="image_url" 
+                       value="{{ product.image_url or '' }}"
+                       placeholder="https://ejemplo.com/imagen.jpg">
+                <small class="form-text">
+                    Proporciona una URL válida de imagen o deja vacío para usar imagen por defecto
+                </small>
+            </div>
+            
+            {% if product.image_url %}
+            <div class="current-image">
+                <label>Imagen Actual:</label>
+                <img src="{{ product.image_url }}" alt="{{ product.name }}" class="preview-image">
+            </div>
+            {% endif %}
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-large">
+                    <i class="fas fa-save"></i> Actualizar Producto
+                </button>
+                <a href="{{ url_for('admin_products') }}" class="btn btn-secondary btn-large">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

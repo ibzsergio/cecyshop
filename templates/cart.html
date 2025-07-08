@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Carrito - CecyShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1><i class="fas fa-shopping-cart"></i> Mi Carrito</h1>
+    </div>
+    
+    {% if cart_items %}
+    <div class="cart-content">
+        <div class="cart-items">
+            {% for item in cart_items %}
+            <div class="cart-item">
+                <div class="item-image">
+                    <img src="{{ item.product.image_url or '/static/images/placeholder.jpg' }}" 
+                         alt="{{ item.product.name }}">
+                </div>
+                
+                <div class="item-info">
+                    <h3>{{ item.product.name }}</h3>
+                    <p class="item-category">{{ item.product.category or 'General' }}</p>
+                    <p class="item-price">{{ item.product.price|mxn }} c/u</p>
+                </div>
+                
+                <div class="item-quantity">
+                    <label>Cantidad:</label>
+                    <div class="quantity-controls">
+                        <button class="qty-btn" onclick="updateQuantity({{ item.id }}, -1)">-</button>
+                        <span class="quantity" id="qty-{{ item.id }}">{{ item.quantity }}</span>
+                        <button class="qty-btn" onclick="updateQuantity({{ item.id }}, 1)">+</button>
+                    </div>
+                </div>
+                
+                <div class="item-total">
+                    <span class="total-price" id="total-{{ item.id }}">
+                        {{ (item.product.price|float * item.quantity)|mxn }}
+                    </span>
+                </div>
+                
+                <div class="item-actions">
+                    <a href="{{ url_for('remove_from_cart', item_id=item.id) }}" 
+                       class="btn btn-danger btn-sm" 
+                       onclick="return confirm('¿Eliminar este producto?')">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="cart-summary">
+            <div class="summary-card">
+                <h3>Resumen del Pedido</h3>
+                
+                <div class="summary-item">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">{{ total|mxn }}</span>
+                </div>
+                
+                <div class="summary-item">
+                    <span>Envío:</span>
+                    <span class="free">Gratis</span>
+                </div>
+                
+                <div class="summary-divider"></div>
+                
+                <div class="summary-item total-item">
+                    <span>Total:</span>
+                    <span id="grandTotal">{{ total|mxn }}</span>
+                </div>
+                
+                <a href="{{ url_for('checkout') }}" class="btn btn-primary btn-full">
+                    <i class="fas fa-credit-card"></i> Proceder al Pago
+                </a>
+                
+                <a href="{{ url_for('index') }}" class="btn btn-secondary btn-full">
+                    <i class="fas fa-arrow-left"></i> Continuar Comprando
+                </a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-cart">
+        <div class="empty-state">
+            <i class="fas fa-shopping-cart"></i>
+            <h2>Tu carrito está vacío</h2>
+            <p>Agrega algunos productos increíbles a tu carrito</p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                <i class="fas fa-shopping-bag"></i> Ir de Compras
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

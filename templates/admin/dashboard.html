@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Panel de Administración - CecyShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="admin-header">
+        <h1><i class="fas fa-cog"></i> Panel de Administración</h1>
+        <p>Gestiona tu tienda desde aquí</p>
+    </div>
+    
+    <div class="admin-dashboard">
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-box"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ products|length }}</h3>
+                    <p>Productos</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ orders|length }}</h3>
+                    <p>Pedidos</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ (orders|sum(attribute='total') or 0)|mxn }}</h3>
+                    <p>Ventas Totales</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>+</h3>
+                    <p>Usuarios</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="admin-actions">
+            <div class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-plus-circle"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Agregar Producto</h3>
+                    <p>Añade nuevos productos a tu catálogo</p>
+                    <a href="{{ url_for('admin_add_product') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Agregar
+                    </a>
+                </div>
+            </div>
+            
+            <div class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Gestionar Productos</h3>
+                    <p>Edita, elimina y organiza productos</p>
+                    <a href="{{ url_for('admin_products') }}" class="btn btn-secondary">
+                        <i class="fas fa-cog"></i> Gestionar
+                    </a>
+                </div>
+            </div>
+            
+            <div class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Ver Reportes</h3>
+                    <p>Analiza ventas y rendimiento</p>
+                    <a href="{{ url_for('admin_reports') }}" class="btn btn-success">
+                        <i class="fas fa-chart-line"></i> Reportes
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="recent-orders">
+            <h2>Pedidos Recientes</h2>
+            
+            {% if orders %}
+            <div class="orders-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Usuario</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders[:10] %}
+                        <tr>
+                            <td>#{{ order.id }}</td>
+                            <td>{{ order.user.username }}</td>
+                            <td>{{ order.total|mxn }}</td>
+                            <td>
+                                <span class="status status-{{ order.status }}">
+                                    {{ order.status.title() }}
+                                </span>
+                            </td>
+                            <td>{{ order.created_at.strftime('%d/%m/%Y') }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>No hay pedidos aún</h3>
+                <p>Los pedidos aparecerán aquí cuando los usuarios hagan compras</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

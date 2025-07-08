@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-logo">
+                <img src="{{ url_for('static', filename='images/logo_cecytem.png') }}" 
+                     alt="CECYTEM - Colegio de Estudios Científicos y Tecnológicos del Estado de México" 
+                     class="cecytem-logo">
+            </div>
+            <h1 class="hero-title">Bienvenido a CecyShop</h1>
+            <p class="hero-subtitle">Descubre productos a precios únicos</p>
+            <p class="hero-institution">Development by Sergio Ibañez</p>
+            <a href="#products" class="btn btn-primary">Explorar Productos</a>
+        </div>
+    </div>
+</div>
+
+<section id="products" class="products-section">
+    <div class="container">
+        <h2 class="section-title">Nuestros Productos</h2>
+        
+        <div class="products-grid">
+            {% for product in products %}
+            <div class="product-card" data-product-id="{{ product.id }}">
+                <div class="product-image">
+                    <img src="{{ product.image_url or '/static/images/placeholder.jpg' }}" 
+                         alt="{{ product.name }}" loading="lazy">
+                    <div class="product-overlay">
+                        <button class="btn btn-icon add-to-cart" data-product-id="{{ product.id }}">
+                            <i class="fas fa-shopping-cart"></i>
+                        </button>
+                        <a href="{{ url_for('product_detail', id=product.id) }}" class="btn btn-icon">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="product-info">
+                    <h3 class="product-name">{{ product.name }}</h3>
+                    <p class="product-category">{{ product.category or 'General' }}</p>
+                    <div class="product-price">
+                        <span class="price">{{ product.price|mxn }}</span>
+                        {% if product.stock > 0 %}
+                            <span class="stock in-stock">En stock</span>
+                        {% else %}
+                            <span class="stock out-stock">Agotado</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="product-actions">
+                        {% if current_user.is_authenticated %}
+                            {% if product.stock > 0 %}
+                                <button class="btn btn-primary add-to-cart" data-product-id="{{ product.id }}">
+                                    <i class="fas fa-shopping-cart"></i> Agregar
+                                </button>
+                            {% else %}
+                                <button class="btn btn-secondary" disabled>
+                                    <i class="fas fa-times"></i> Agotado
+                                </button>
+                            {% endif %}
+                        {% else %}
+                            <a href="{{ url_for('login') }}" class="btn btn-outline">
+                                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if not products %}
+        <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <h3>No hay productos disponibles</h3>
+            <p>Pronto agregaremos nuevos productos increíbles</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Modal de producto agregado -->
+<div class="modal" id="addedToCartModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-check-circle"></i> ¡Producto agregado!</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>El producto ha sido agregado a tu carrito exitosamente.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary modal-close">Continuar comprando</button>
+            <a href="{{ url_for('cart') }}" class="btn btn-primary">Ver carrito</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

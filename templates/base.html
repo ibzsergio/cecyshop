@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CecyShop{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Menú flotante -->
+    <nav class="floating-nav" id="floatingNav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <img src="{{ url_for('static', filename='images/logo_cecytem.png') }}" 
+                     alt="CECYTEM" class="nav-logo">
+                <a href="{{ url_for('index') }}">CecyShop</a>
+            </div>
+            
+            <div class="nav-menu" id="navMenu">
+                <a href="{{ url_for('index') }}" class="nav-link">
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+                
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('cart') }}" class="nav-link">
+                        <i class="fas fa-shopping-cart"></i> Carrito
+                        <span class="cart-count" id="cartCount">0</span>
+                    </a>
+                    <a href="{{ url_for('orders') }}" class="nav-link">
+                        <i class="fas fa-box"></i> Mis Pedidos
+                    </a>
+                    
+                    {% if current_user.is_admin %}
+                        <a href="{{ url_for('admin_dashboard') }}" class="nav-link admin-link">
+                            <i class="fas fa-cog"></i> Admin
+                        </a>
+                    {% endif %}
+                    
+                    <div class="nav-dropdown">
+                        <a href="#" class="nav-link dropdown-toggle">
+                            <i class="fas fa-user"></i> {{ current_user.username }}
+                        </a>
+                        <div class="dropdown-menu">
+                            {% if current_user.is_admin %}
+                                <a href="{{ url_for('admin_dashboard') }}" class="dropdown-item">
+                                    <i class="fas fa-cog"></i> Panel Admin
+                                </a>
+                                <div class="dropdown-divider"></div>
+                            {% endif %}
+                            <a href="{{ url_for('logout') }}" class="dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="nav-link">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </a>
+                    <a href="{{ url_for('register') }}" class="nav-link btn-register">
+                        <i class="fas fa-user-plus"></i> Registrarse
+                    </a>
+                {% endif %}
+            </div>
+            
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert-container">
+                    {% for message in messages %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            {{ message }}
+                            <button class="alert-close">&times;</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-brand">
+                        <img src="{{ url_for('static', filename='images/logo_cecytem.png') }}" 
+                             alt="CECYTEM" class="footer-logo">
+                        <h3>CecyShop</h3>
+                    </div>
+                    <p>Tu tienda online de confianza con productos de calidad y diseño minimalista.</p>
+                    <p><strong>Desarrollado por estudiantes de CECYTEM</strong></p>
+                </div>
+                <div class="footer-section">
+                    <h4>Enlaces</h4>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">Inicio</a></li>
+                        <li><a href="#">Nosotros</a></li>
+                        <li><a href="#">Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Soporte</h4>
+                    <ul>
+                        <li><a href="#">Ayuda</a></li>
+                        <li><a href="#">Términos</a></li>
+                        <li><a href="#">Privacidad</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 CecyShop. Todos los derechos reservados. Desarrollado por Sergio Ibañez para CECYTEM.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/cart-simple.js') }}"></script>
+</body>
+</html>

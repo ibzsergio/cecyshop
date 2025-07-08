@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes - CecyShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="admin-header">
+        <h1><i class="fas fa-chart-bar"></i> Reportes y Estadísticas</h1>
+        <p>Análisis detallado de tu negocio</p>
+    </div>
+
+    <!-- Estadísticas Generales -->
+    <div class="stats-overview">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ total_products }}</h3>
+                <p>Total Productos</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ total_orders }}</h3>
+                <p>Total Pedidos</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ total_users }}</h3>
+                <p>Total Usuarios</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ total_revenue|mxn }}</h3>
+                <p>Ingresos Totales</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones de Reportes -->
+    <div class="reports-actions">
+        <a href="{{ url_for('admin_sales_report') }}" class="btn btn-primary">
+            <i class="fas fa-chart-line"></i> Reporte de Ventas
+        </a>
+        <a href="{{ url_for('admin_products_report') }}" class="btn btn-secondary">
+            <i class="fas fa-boxes"></i> Reporte de Productos
+        </a>
+        <button onclick="window.print()" class="btn btn-success">
+            <i class="fas fa-print"></i> Imprimir Esta Página
+        </button>
+    </div>
+
+    <!-- Productos Más Vendidos -->
+    {% if top_products %}
+    <div class="report-section">
+        <h2><i class="fas fa-trophy"></i> Productos Más Vendidos</h2>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Precio</th>
+                        <th>Unidades Vendidas</th>
+                        <th>Ranking</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in top_products %}
+                    <tr>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.price|mxn }}</td>
+                        <td>{{ product.total_sold }}</td>
+                        <td>
+                            <div class="ranking-bar">
+                                <div class="ranking-fill" style="width: {{ (product.total_sold / top_products[0].total_sold * 100) }}%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Ventas por Mes -->
+    {% if monthly_sales %}
+    <div class="report-section">
+        <h2><i class="fas fa-calendar-alt"></i> Ventas Mensuales</h2>
+        <div class="chart-container">
+            <canvas id="monthlyChart"></canvas>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Pedidos Recientes -->
+    {% if recent_orders %}
+    <div class="report-section">
+        <h2><i class="fas fa-clock"></i> Pedidos Recientes</h2>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuario</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>{{ order.user.username }}</td>
+                        <td>{{ order.total|mxn }}</td>
+                        <td>
+                            <span class="status-badge status-{{ order.status }}">
+                                {{ order.status|title }}
+                            </span>
+                        </td>
+                        <td>{{ order.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Gráfico de ventas mensuales
+{% if monthly_sales %}
+const monthlyData = {
+    labels: [{% for sale in monthly_sales %}'{{ sale.month }}'{% if not loop.last %},{% endif %}{% endfor %}],
+    datasets: [{
+        label: 'Ventas',
+        data: [{% for sale in monthly_sales %}{{ sale.total }}{% if not loop.last %},{% endif %}{% endfor %}],
+        backgroundColor: 'rgba(39, 174, 96, 0.2)',
+        borderColor: 'rgba(39, 174, 96, 1)',
+        borderWidth: 2,
+        fill: true
+    }]
+};
+
+const ctx = document.getElementById('monthlyChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: monthlyData,
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '$' + value.toFixed(2) + ' MXN';
+                    }
+                }
+            }
+        }
+    }
+});
+{% endif %}
+</script>
+
+{% endblock %}

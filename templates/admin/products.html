@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Gestionar Productos - Admin{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="admin-header">
+        <h1><i class="fas fa-box"></i> Gestionar Productos</h1>
+        <a href="{{ url_for('admin_add_product') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Agregar Producto
+        </a>
+    </div>
+    
+    {% if products %}
+    <div class="products-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>
+                        <img src="{{ product.image_url or '/static/images/placeholder.jpg' }}" 
+                             alt="{{ product.name }}" class="product-thumb">
+                    </td>
+                    <td>
+                        <strong>{{ product.name }}</strong>
+                        {% if product.description %}
+                        <br><small>{{ product.description[:50] }}{% if product.description|length > 50 %}...{% endif %}</small>
+                        {% endif %}
+                    </td>
+                    <td>{{ product.category or 'Sin categoría' }}</td>
+                    <td>${{ "%.2f"|format(product.price) }}</td>
+                    <td>
+                        {% if product.stock > 0 %}
+                            <span class="stock in-stock">{{ product.stock }}</span>
+                        {% else %}
+                            <span class="stock out-stock">Agotado</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ product.created_at.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{{ url_for('admin_edit_product', id=product.id) }}" 
+                               class="btn btn-sm btn-secondary" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{{ url_for('admin_delete_product', id=product.id) }}" 
+                               class="btn btn-sm btn-danger" title="Eliminar"
+                               onclick="return confirm('¿Estás seguro de eliminar este producto?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-box-open"></i>
+        <h2>No hay productos</h2>
+        <p>Agrega tu primer producto para comenzar a vender</p>
+        <a href="{{ url_for('admin_add_product') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Agregar Primer Producto
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

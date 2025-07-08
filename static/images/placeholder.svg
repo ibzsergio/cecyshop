@@ -1,0 +1,11 @@
+<!-- Placeholder SVG para productos sin imagen -->
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="300" fill="#f8f9fa"/>
+    <circle cx="200" cy="120" r="30" fill="#27ae60"/>
+    <text x="200" y="180" text-anchor="middle" fill="#6c757d" font-family="Arial, sans-serif" font-size="16">
+        Imagen no disponible
+    </text>
+    <text x="200" y="200" text-anchor="middle" fill="#6c757d" font-family="Arial, sans-serif" font-size="12">
+        CecyShop
+    </text>
+</svg>

@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte de Productos - CecyShop{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="admin-header">
+        <h1><i class="fas fa-boxes"></i> Reporte de Productos</h1>
+        <p>Análisis detallado del inventario y rendimiento</p>
+    </div>
+
+    <!-- Acciones -->
+    <div class="report-actions">
+        <button onclick="window.print()" class="btn btn-success">
+            <i class="fas fa-print"></i> Imprimir Reporte
+        </button>
+        <a href="{{ url_for('admin_reports') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver a Reportes
+        </a>
+    </div>
+
+    <!-- Productos con Stock Bajo -->
+    {% if low_stock_products %}
+    <div class="report-section alert-section">
+        <h2><i class="fas fa-exclamation-triangle"></i> Productos con Stock Bajo</h2>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Stock Actual</th>
+                        <th>Precio</th>
+                        <th>Categoría</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in low_stock_products %}
+                    <tr class="low-stock-row">
+                        <td>{{ product.name }}</td>
+                        <td>
+                            <span class="stock-badge {% if product.stock < 5 %}critical{% else %}warning{% endif %}">
+                                {{ product.stock }}
+                            </span>
+                        </td>
+                        <td>${{ "%.2f"|format(product.price) }}</td>
+                        <td>{{ product.category }}</td>
+                        <td>
+                            {% if product.stock == 0 %}
+                                <span class="status-badge status-out">Agotado</span>
+                            {% elif product.stock < 5 %}
+                                <span class="status-badge status-critical">Crítico</span>
+                            {% else %}
+                                <span class="status-badge status-warning">Bajo</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Productos Más Vendidos -->
+    {% if top_products %}
+    <div class="report-section">
+        <h2><i class="fas fa-trophy"></i> Productos Más Vendidos</h2>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Ranking</th>
+                        <th>Producto</th>
+                        <th>Precio</th>
+                        <th>Stock Actual</th>
+                        <th>Unidades Vendidas</th>
+                        <th>Ingresos Generados</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in top_products %}
+                    <tr>
+                        <td>
+                            <span class="ranking-number">{{ loop.index }}</span>
+                        </td>
+                        <td>{{ product.name }}</td>
+                        <td>${{ "%.2f"|format(product.price) }}</td>
+                        <td>{{ product.stock }}</td>
+                        <td>{{ product.total_sold }}</td>
+                        <td>${{ "%.2f"|format(product.total_revenue) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Productos Nunca Vendidos -->
+    {% if never_sold %}
+    <div class="report-section">
+        <h2><i class="fas fa-times-circle"></i> Productos Sin Ventas</h2>
+        <p class="section-description">Estos productos no han tenido ventas y podrían necesitar revisión.</p>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Categoría</th>
+                        <th>Fecha Creación</th>
+                        <th>Valor Inventario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in never_sold %}
+                    <tr>
+                        <td>{{ product.name }}</td>
+                        <td>${{ "%.2f"|format(product.price) }}</td>
+                        <td>{{ product.stock }}</td>
+                        <td>{{ product.category }}</td>
+                        <td>{{ product.created_at.strftime('%d/%m/%Y') }}</td>
+                        <td>${{ "%.2f"|format(product.price|float * product.stock) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Resumen General -->
+    <div class="report-summary">
+        <div class="summary-grid">
+            <div class="summary-item">
+                <h3>Productos con Stock Bajo</h3>
+                <p class="summary-number">{{ low_stock_products|length }}</p>
+            </div>
+            <div class="summary-item">
+                <h3>Productos Más Vendidos</h3>
+                <p class="summary-number">{{ top_products|length }}</p>
+            </div>
+            <div class="summary-item">
+                <h3>Productos Sin Ventas</h3>
+                <p class="summary-number">{{ never_sold|length }}</p>
+            </div>
+            <div class="summary-item">
+                <h3>Valor Total Inventario</h3>
+                <p class="summary-number">
+                    ${{ "%.2f"|format(never_sold|sum(attribute='price') * never_sold|sum(attribute='stock') if never_sold else 0) }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
